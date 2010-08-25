@@ -29,12 +29,12 @@
 %%%-------------------------------------------------------------------
 -module(cushion_couch_api).
 
--export([get_document/4]).
+-export([get_document/4, create_document/5]).
 
 %%--------------------------------------------------------------------
 %% @doc Fetch a document.
-%% @spec get_document(string(), int(), string(), string()) -> binary()
-%% @throws {couchdb_error, {ErrorCode::int(), Body::binary()}}
+%% @spec get_document(string(), integer(), string(), string()) -> binary()
+%% @throws {couchdb_error, {ErrorCode::integer(), Body::binary()}}
 %% @end
 %%--------------------------------------------------------------------
 get_document(Couch, Port, Db, DocId) ->
@@ -45,6 +45,26 @@ get_document(Couch, Port, Db, DocId) ->
 	  "GET", [], infinity),
     case Result of
 	{200, _} ->
+	    Body;
+	{ErrorCode, _} ->
+	    throw({couchdb_error, {ErrorCode, Body}})
+    end.
+
+%%--------------------------------------------------------------------
+%% @doc Create a new document.
+%% @spec create_document(string(), integer(), string(), string(),
+%%                       deep_string()) -> binary()
+%% @throws {couchdb_error, {ErrorCode::integer(), Body::binary()}}
+%% @end
+%%--------------------------------------------------------------------
+create_document(Couch, Port, Db, DocId, Fields) ->
+    {ok, {Result, _Headers, Body}} =
+	lhttpc:request(
+	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Db ++ "/"
+	  ++ DocId,
+	  "PUT", [], Fields, infinity),
+    case Result of
+	{201, _} ->
 	    Body;
 	{ErrorCode, _} ->
 	    throw({couchdb_error, {ErrorCode, Body}})
