@@ -21,7 +21,7 @@
 %%% @copyright (C) 2010, Samuel
 %%% @doc This module contains functions that map directly to CouchDB api.
 %%%
-%%% See http://wiki.apache.org/couchdb/API_Cheatsheet for a quick reference.
+%%% See [http://wiki.apache.org/couchdb/API_Cheatsheet] for a quick reference.
 %%%
 %%% All functions in this module return the raw response from CouchDB.
 %%%
@@ -32,12 +32,20 @@
 -export([get_document/4]).
 
 %%--------------------------------------------------------------------
-%% @doc Retrieve a document.
+%% @doc Fetch a document.
 %% @spec get_document(string(), int(), string(), string()) -> binary()
+%% @throws {couchdb_error, {ErrorCode::int(), Body::binary()}}
 %% @end
 %%--------------------------------------------------------------------
 get_document(Couch, Port, Db, DocId) ->
-    lhttpc:request(
-      "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Db ++ "/"
-      ++ DocId,
-      "GET", [], infinity).
+    {ok, {Result, _Headers, Body}} =
+	lhttpc:request(
+	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Db ++ "/"
+	  ++ DocId,
+	  "GET", [], infinity),
+    case Result of
+	{200, _} ->
+	    Body;
+	{ErrorCode, _} ->
+	    throw({couchdb_error, {ErrorCode, Body}})
+    end.
