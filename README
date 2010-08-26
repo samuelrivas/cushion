@@ -15,4 +15,15 @@ In the future, I'll create a bootstraper to automate this process.
 TESTING
 -------
 
-All tests are in cushion_tests application.
+All tests are in the cushion_tests application.
+
+INTERNAL DETAILS
+----------------
+
+The code is organised as follows:
+
+  * The cushion_couch_api module contains raw calls to the couchdb API. There
+    are not any inteligence here, most of the magic happens in lhttpc
+    guts. Responses are unparsed binaries. This module is nice for low level
+    couchdb testing when something goes wrong in other modules but is not
+    intended for external use.
