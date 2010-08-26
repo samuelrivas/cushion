@@ -1,0 +1,18 @@
+INTRODUCTION
+------------
+
+Cushion is an adaptation layer for couchdb. It's in early stages of development,
+more documentation will be added when it's more advanced.
+
+BUILDING
+--------
+
+It is quite manual right now. I just set up an erlware project with lhttpc,
+cushion, and cushion_tests in the lib dir and compile them.
+
+In the future, I'll create a bootstraper to automate this process.
+
+TESTING
+-------
+
+All tests are in cushion_tests application.
