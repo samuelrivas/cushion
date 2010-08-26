@@ -27,6 +27,10 @@
 %%%
 %%% @end
 %%%-------------------------------------------------------------------
+
+%%% XXX So far, this is basically a huge copy'n paste work. After the first wave
+%%% of tests are finished, this is going to be heavily refactorised
+
 -module(cushion_couch_api).
 
 -export([get_document/4, create_document/4, update_document/5,
