@@ -29,7 +29,8 @@
 %%%-------------------------------------------------------------------
 -module(cushion_couch_api).
 
--export([get_document/4, create_document/4, create_document/5]).
+-export([get_document/4, create_document/4, create_document/5,
+	 delete_document/5]).
 
 %%--------------------------------------------------------------------
 %% @doc Fetch a document.
@@ -84,6 +85,26 @@ create_document(Couch, Port, Db, DocId, Fields) ->
 	  "PUT", [], Fields, infinity),
     case Result of
 	{201, _} ->
+	    Body;
+	{ErrorCode, _} ->
+	    throw({couchdb_error, {ErrorCode, Body}})
+    end.
+
+%%--------------------------------------------------------------------
+%% @doc Delete a document
+%% @spec delete_document(string(), integer(), string(), string(), string()) ->
+%%                       binary()
+%% @throws {couchdb_error, {ErrorCode::integer(), Body::binary()}}
+%% @end
+%%--------------------------------------------------------------------
+delete_document(Couch, Port, Db, DocId, Rev) ->
+    {ok, {Result, _Headers, Body}} =
+	lhttpc:request(
+	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Db ++ "/"
+	  ++ DocId ++ "?rev=" ++ Rev,
+	  "DELETE", [], infinity),
+    case Result of
+	{200, _} ->
 	    Body;
 	{ErrorCode, _} ->
 	    throw({couchdb_error, {ErrorCode, Body}})
