@@ -30,7 +30,7 @@
 -module(cushion_couch_api).
 
 -export([get_document/4, create_document/4, update_document/5,
-	 delete_document/5]).
+	 delete_document/5, create_db/3]).
 
 %%--------------------------------------------------------------------
 %% @doc Fetch a document.
@@ -120,3 +120,23 @@ delete_document(Couch, Port, Db, DocId, Rev) ->
 	{ErrorCode, _} ->
 	    throw({couchdb_error, {ErrorCode, Body}})
     end.
+
+%%--------------------------------------------------------------------
+%% @doc Create a new database
+%%
+%% @spec create_db(string(), integer(), string()) -> binary()
+%% @throws {couchdb_error, {ErrorCode::integer(), Body::binary()}}
+%% @end
+%%--------------------------------------------------------------------
+create_db(Couch, Port, Db) ->
+    {ok, {Result, _Headers, Body}} =
+	lhttpc:request(
+	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Db,
+	  "PUT", [], infinity),
+    case Result of
+	{201, _} ->
+	    Body;
+	{ErrorCode, _} ->
+	    throw({couchdb_error, {ErrorCode, Body}})
+    end.
+
