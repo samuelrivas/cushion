@@ -84,8 +84,7 @@ update_document(Couch, Port, Db, DocId, Fields) ->
 %% @end
 %%--------------------------------------------------------------------
 delete_document(Couch, Port, Db, DocId, Rev) ->
-    {Result, Body} = send_request(Couch, Port, "DELETE", path(Db, DocId, Rev)),
-    check_result("DELETE", Result, Body).
+    http_request(Couch, Port, "DELETE", path(Db, DocId, Rev)).
 
 %%--------------------------------------------------------------------
 %% @doc Create a new database
@@ -105,8 +104,7 @@ create_db(Couch, Port, Db) ->
 %% @end
 %%--------------------------------------------------------------------
 delete_db(Couch, Port, Db) ->
-    {Result, Body} = send_request(Couch, Port, "DELETE", Db),
-    check_result("DELETE", Result, Body).
+    http_request(Couch, Port, "DELETE", Db).
 
 %%%-------------------------------------------------------------------
 %%% Internals
@@ -117,9 +115,6 @@ http_request(Couch, Port, Method, Path) ->
 http_request(Couch, Port, Method, Path, Payload) ->
     {Result, Body} = send_request(Couch, Port, Method, Path, Payload),
     check_result(Method, Result, Body).
-
-send_request(Couch, Port, Method, Path) ->
-    send_request(Couch, Port, Method, Path, "").
 
 send_request(Couch, Port, Method, Path, Payload) ->
     Url = cushion_util:format("http://~s:~w/~s", [Couch, Port, Path]),
