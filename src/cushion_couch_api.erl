@@ -43,7 +43,7 @@
 %% @end
 %%--------------------------------------------------------------------
 get_document(Couch, Port, Db, DocId) ->
-    {Result, Body} = request(Couch, Port, "GET", Db ++ "/" ++ DocId),
+    {Result, Body} = request(Couch, Port, "GET", path(Db, DocId)),
     check_result(200, Result, Body).
 
 %%--------------------------------------------------------------------
@@ -76,7 +76,7 @@ create_document(Couch, Port, Db, Fields) ->
 %% @end
 %%--------------------------------------------------------------------
 update_document(Couch, Port, Db, DocId, Fields) ->
-    {Result, Body} = request(Couch, Port, "PUT", Db ++ "/" ++ DocId, Fields),
+    {Result, Body} = request(Couch, Port, "PUT", path(Db, DocId), Fields),
     check_result(201, Result, Body).
 
 %%--------------------------------------------------------------------
@@ -87,8 +87,7 @@ update_document(Couch, Port, Db, DocId, Fields) ->
 %% @end
 %%--------------------------------------------------------------------
 delete_document(Couch, Port, Db, DocId, Rev) ->
-    {Result, Body} =
-        request(Couch, Port, "DELETE", Db ++ "/" ++ DocId ++ "?rev=" ++ Rev),
+    {Result, Body} = request(Couch, Port, "DELETE", path(Db, DocId, Rev)),
     check_result(200, Result, Body).
 
 %%--------------------------------------------------------------------
@@ -131,8 +130,15 @@ request(Couch, Port, Method, Path) ->
     request(Couch, Port, Method, Path, "").
 
 request(Couch, Port, Method, Path, Payload) ->
+    Url = cushion_util:format("http://~s:~w/~s", [Couch, Port, Path]),
     {ok, {Result, _Headers, Body}} =
 	lhttpc:request(
-	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Path,
-	  Method, [{"Content-Type", "application/json"}], Payload, infinity),
+          Url, Method, [{"Content-Type", "application/json"}], Payload,
+          infinity),
     {Result, Body}.
+
+path(Db, File) ->
+    filename:join(Db, File).
+
+path(Db, File, Rev) ->
+    io_lib:format("~s?rev=~s", [path(Db, File), Rev]).

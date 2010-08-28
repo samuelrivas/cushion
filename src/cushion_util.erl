@@ -29,7 +29,7 @@
 %%%-------------------------------------------------------------------
 -module(cushion_util).
 
--export([start_app/1]).
+-export([start_app/1, format/2]).
 
 %%--------------------------------------------------------------------
 %% @doc Starts an application and all its dependencies.
@@ -55,3 +55,14 @@ start_app(App, N) ->
         ok ->
             [App]
     end.
+
+%%--------------------------------------------------------------------
+%% @doc The same as io_lib:format/2 but flattening the result.
+%%
+%% Don't use this if you can use the deep list returned by io_lib:format, it is
+%% more efficient than flattening each intermediate result this function does.
+%% @spec format("string", [term()]) -> string().
+%% @end
+%%--------------------------------------------------------------------
+format(Format, Args) ->
+    lists:flatten(io_lib:format(Format, Args)).
