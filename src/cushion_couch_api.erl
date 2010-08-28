@@ -52,7 +52,7 @@ get_document(Couch, Port, Db, DocId) ->
 	{200, _} ->
 	    Body;
 	{ErrorCode, _} ->
-	    throw({couchdb_error, {ErrorCode, Body}})
+	    couch_error(Body, ErrorCode)
     end.
 
 %%--------------------------------------------------------------------
@@ -76,7 +76,7 @@ create_document(Couch, Port, Db, Fields) ->
 	{201, _} ->
 	    Body;
 	{ErrorCode, _} ->
-	    throw({couchdb_error, {ErrorCode, Body}})
+	    couch_error(Body, ErrorCode)
     end.
 
 %%--------------------------------------------------------------------
@@ -102,7 +102,7 @@ update_document(Couch, Port, Db, DocId, Fields) ->
 	{201, _} ->
 	    Body;
 	{ErrorCode, _} ->
-	    throw({couchdb_error, {ErrorCode, Body}})
+	    couch_error(Body, ErrorCode)
     end.
 
 %%--------------------------------------------------------------------
@@ -122,7 +122,7 @@ delete_document(Couch, Port, Db, DocId, Rev) ->
 	{200, _} ->
 	    Body;
 	{ErrorCode, _} ->
-	    throw({couchdb_error, {ErrorCode, Body}})
+	    couch_error(Body, ErrorCode)
     end.
 
 %%--------------------------------------------------------------------
@@ -141,7 +141,7 @@ create_db(Couch, Port, Db) ->
 	{201, _} ->
 	    Body;
 	{ErrorCode, _} ->
-	    throw({couchdb_error, {ErrorCode, Body}})
+	    couch_error(Body, ErrorCode)
     end.
 
 %%--------------------------------------------------------------------
@@ -160,6 +160,11 @@ delete_db(Couch, Port, Db) ->
 	{200, _} ->
 	    Body;
 	{ErrorCode, _} ->
-	    throw({couchdb_error, {ErrorCode, Body}})
+	    couch_error(Body, ErrorCode)
     end.
 
+%%%-------------------------------------------------------------------
+%%% Internals
+%%%-------------------------------------------------------------------
+couch_error(Body, ErrorCode) ->
+   throw({couchdb_error, {ErrorCode, Body}}).
