@@ -76,8 +76,7 @@ create_document(Couch, Port, Db, Fields) ->
 %% @end
 %%--------------------------------------------------------------------
 update_document(Couch, Port, Db, DocId, Fields) ->
-    {Result, Body} = request(Couch, Port, "PUT", path(Db, DocId), Fields),
-    check_result(201, Result, Body).
+    http_put(Couch, Port, path(Db, DocId), Fields).
 
 %%--------------------------------------------------------------------
 %% @doc Delete a document
@@ -98,8 +97,7 @@ delete_document(Couch, Port, Db, DocId, Rev) ->
 %% @end
 %%--------------------------------------------------------------------
 create_db(Couch, Port, Db) ->
-    {Result, Body} = request(Couch, Port, "PUT", Db),
-    check_result(201, Result, Body).
+    http_put(Couch, Port, Db).
 
 %%--------------------------------------------------------------------
 %% @doc Delete and existing database
@@ -125,6 +123,13 @@ check_result(Expected, Result, Body) ->
 
 couch_error(Body, ErrorCode) ->
    throw({couchdb_error, {ErrorCode, Body}}).
+
+http_put(Couch, Port, Path) ->
+    http_put(Couch, Port, Path, "").
+
+http_put(Couch, Port, Path, Payload) ->
+    {Result, Body} = request(Couch, Port, "PUT", Path, Payload),
+    check_result(201, Result, Body).
 
 request(Couch, Port, Method, Path) ->
     request(Couch, Port, Method, Path, "").
