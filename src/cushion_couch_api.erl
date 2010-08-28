@@ -111,17 +111,6 @@ delete_db(Couch, Port, Db) ->
 %%%-------------------------------------------------------------------
 %%% Internals
 %%%-------------------------------------------------------------------
-check_result(Expected, Result, Body) ->
-    case Result of
-        {Expected, _} ->
-            Body;
-        {ErrorCode, _} ->
-            couch_error(Body, ErrorCode)
-    end.
-
-couch_error(Body, ErrorCode) ->
-   throw({couchdb_error, {ErrorCode, Body}}).
-
 http_put(Couch, Port, Path) ->
     http_put(Couch, Port, Path, "").
 
@@ -147,6 +136,17 @@ request(Couch, Port, Method, Path, Payload) ->
           Url, Method, [{"Content-Type", "application/json"}], Payload,
           infinity),
     {Result, Body}.
+
+check_result(Expected, Result, Body) ->
+    case Result of
+        {Expected, _} ->
+            Body;
+        {ErrorCode, _} ->
+            couch_error(Body, ErrorCode)
+    end.
+
+couch_error(Body, ErrorCode) ->
+   throw({couchdb_error, {ErrorCode, Body}}).
 
 path(Db, File) ->
     filename:join(Db, File).
