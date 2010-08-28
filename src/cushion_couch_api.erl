@@ -58,8 +58,7 @@ get_document(Couch, Port, Db, DocId) ->
 %% @end
 %%--------------------------------------------------------------------
 create_document(Couch, Port, Db, Fields) ->
-    {Result, Body} = request(Couch, Port, "POST", Db, Fields),
-    check_result(201, Result, Body).
+    http_post(Couch, Port, Db, Fields).
 
 %%--------------------------------------------------------------------
 %% @doc Create a new document or update an existing one
@@ -133,6 +132,10 @@ http_put(Couch, Port, Path, Payload) ->
 http_get(Couch, Port, Path) ->
     {Result, Body} = request(Couch, Port, "GET", Path),
     check_result(200, Result, Body).
+
+http_post(Couch, Port, Path, Payload) ->
+    {Result, Body} = request(Couch, Port, "POST", Path, Payload),
+    check_result(201, Result, Body).
 
 request(Couch, Port, Method, Path) ->
     request(Couch, Port, Method, Path, "").
