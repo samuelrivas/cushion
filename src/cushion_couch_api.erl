@@ -79,11 +79,7 @@ create_document(Couch, Port, Db, Fields) ->
 %% @end
 %%--------------------------------------------------------------------
 update_document(Couch, Port, Db, DocId, Fields) ->
-    {ok, {Result, _Headers, Body}} =
-	lhttpc:request(
-	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Db ++ "/"
-	  ++ DocId,
-	  "PUT", [], Fields, infinity),
+    {Result, Body} = request(Couch, Port, "PUT", Db ++ "/" ++ DocId, Fields),
     check_result(201, Result, Body).
 
 %%--------------------------------------------------------------------
@@ -139,4 +135,11 @@ request(Couch, Port, Method, Path) ->
 	lhttpc:request(
 	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Path,
 	  Method, [], infinity),
+    {Result, Body}.
+
+request(Couch, Port, Method, Path, Payload) ->
+    {ok, {Result, _Headers, Body}} =
+	lhttpc:request(
+	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Path,
+	  Method, [], Payload, infinity),
     {Result, Body}.
