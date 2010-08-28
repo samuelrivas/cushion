@@ -128,11 +128,7 @@ couch_error(Body, ErrorCode) ->
    throw({couchdb_error, {ErrorCode, Body}}).
 
 request(Couch, Port, Method, Path) ->
-    {ok, {Result, _Headers, Body}} =
-	lhttpc:request(
-	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Path,
-	  Method, [], infinity),
-    {Result, Body}.
+    request(Couch, Port, Method, Path, "").
 
 request(Couch, Port, Method, Path, Payload) ->
     {ok, {Result, _Headers, Body}} =
