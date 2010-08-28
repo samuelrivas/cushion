@@ -43,11 +43,7 @@
 %% @end
 %%--------------------------------------------------------------------
 get_document(Couch, Port, Db, DocId) ->
-    {ok, {Result, _Headers, Body}} =
-	lhttpc:request(
-	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Db ++ "/"
-	  ++ DocId,
-	  "GET", [], infinity),
+    {Result, Body} = request(Couch, Port, "GET", Db ++ "/" ++ DocId),
     check_result(200, Result, Body).
 
 %%--------------------------------------------------------------------
@@ -98,11 +94,8 @@ update_document(Couch, Port, Db, DocId, Fields) ->
 %% @end
 %%--------------------------------------------------------------------
 delete_document(Couch, Port, Db, DocId, Rev) ->
-    {ok, {Result, _Headers, Body}} =
-	lhttpc:request(
-	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Db ++ "/"
-	  ++ DocId ++ "?rev=" ++ Rev,
-	  "DELETE", [], infinity),
+    {Result, Body} =
+        request(Couch, Port, "DELETE", Db ++ "/" ++ DocId ++ "?rev=" ++ Rev),
     check_result(200, Result, Body).
 
 %%--------------------------------------------------------------------
@@ -113,10 +106,7 @@ delete_document(Couch, Port, Db, DocId, Rev) ->
 %% @end
 %%--------------------------------------------------------------------
 create_db(Couch, Port, Db) ->
-    {ok, {Result, _Headers, Body}} =
-	lhttpc:request(
-	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Db,
-	  "PUT", [], infinity),
+    {Result, Body} = request(Couch, Port, "PUT", Db),
     check_result(201, Result, Body).
 
 %%--------------------------------------------------------------------
@@ -127,10 +117,7 @@ create_db(Couch, Port, Db) ->
 %% @end
 %%--------------------------------------------------------------------
 delete_db(Couch, Port, Db) ->
-    {ok, {Result, _Headers, Body}} =
-	lhttpc:request(
-	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Db,
-	  "DELETE", [], infinity),
+    {Result, Body} = request(Couch, Port, "DELETE", Db),
     check_result(200, Result, Body).
 
 %%%-------------------------------------------------------------------
@@ -146,3 +133,10 @@ check_result(Expected, Result, Body) ->
 
 couch_error(Body, ErrorCode) ->
    throw({couchdb_error, {ErrorCode, Body}}).
+
+request(Couch, Port, Method, Path) ->
+    {ok, {Result, _Headers, Body}} =
+	lhttpc:request(
+	  "http://" ++ Couch ++ ":" ++ integer_to_list(Port) ++ "/" ++ Path,
+	  Method, [], infinity),
+    {Result, Body}.
