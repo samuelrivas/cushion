@@ -17,8 +17,8 @@
 %%% Cushion.  If not, see <http://www.gnu.org/licenses/>.
 %%%-------------------------------------------------------------------
 %%%-------------------------------------------------------------------
-%%% @author Samuel <samuelrivas@gmail.com>
-%%% @copyright (C) 2010, Samuel
+%%% @author Samuel Rivas <samuelrivas@gmail.com>
+%%% @copyright (C) 2010, Samuel Rivas
 %%% @doc This module contains functions that map directly to CouchDB api.
 %%%
 %%% See [http://wiki.apache.org/couchdb/API_Cheatsheet] for a quick reference.
