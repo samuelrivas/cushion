@@ -126,7 +126,7 @@ check_result(Method, Result, Body) ->
         {Expected, _} ->
             Body;
         {ErrorCode, _} ->
-            couch_error(Body, ErrorCode)
+            couch_error(ErrorCode, Body)
     end.
 
 expected_result(Method) when Method =:= "GET"; Method =:= "DELETE" ->
@@ -134,7 +134,7 @@ expected_result(Method) when Method =:= "GET"; Method =:= "DELETE" ->
 expected_result(Method) when Method =:= "PUT"; Method =:= "POST" ->
     201.
 
-couch_error(Body, ErrorCode) ->
+couch_error(ErrorCode, Body) ->
    throw({couchdb_error, {ErrorCode, Body}}).
 
 path(Db, File) ->
