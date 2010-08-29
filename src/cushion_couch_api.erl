@@ -109,29 +109,29 @@ http_request(Couch, Port, Method, Path) ->
     http_request(Couch, Port, Method, Path, "").
 
 http_request(Couch, Port, Method, Path, Payload) ->
-    {Result, Body} = send_request(Couch, Port, Method, Path, Payload),
-    check_result(Method, Result, Body).
+    {Status, Body} = send_request(Couch, Port, Method, Path, Payload),
+    check_status(Method, Status, Body).
 
 send_request(Couch, Port, Method, Path, Payload) ->
     Url = cushion_util:format("http://~s:~w/~s", [Couch, Port, Path]),
-    {ok, {Result, _Headers, Body}} =
+    {ok, {Status, _Headers, Body}} =
 	lhttpc:request(
           Url, Method, [{"Content-Type", "application/json"}], Payload,
           infinity),
-    {Result, Body}.
+    {Status, Body}.
 
-check_result(Method, Result, Body) ->
-    Expected = expected_result(Method),
-    case Result of
+check_status(Method, Status, Body) ->
+    Expected = expected_status(Method),
+    case Status of
         {Expected, _} ->
             Body;
         {ErrorCode, _} ->
             couch_error(ErrorCode, Body)
     end.
 
-expected_result(Method) when Method =:= "GET"; Method =:= "DELETE" ->
+expected_status(Method) when Method =:= "GET"; Method =:= "DELETE" ->
     200;
-expected_result(Method) when Method =:= "PUT"; Method =:= "POST" ->
+expected_status(Method) when Method =:= "PUT"; Method =:= "POST" ->
     201.
 
 couch_error(ErrorCode, Body) ->
