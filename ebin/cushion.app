@@ -1,7 +1,7 @@
 {application, cushion,
  [{description, "CouchDB adaptation layer"},
   {vsn, "devel"},
-  {modules, [cushion_couch_api, cushion_util]},
+  {modules, [cushion_couch_api, cushion_util, cushion_json]},
   {registered, []},
-  {applications, [kernel, stdlib, lhttpc]},
+  {applications, [kernel, stdlib, lhttpc, ktuo]},
   {env, []}]}.
