@@ -29,9 +29,18 @@
 -module(cushion_json).
 -export([erl2json/1, json2erl/1]).
 
-json2erl(Stream) ->
+json2erl(IoList) ->
+    Stream = lists:flatten(IoList),
     {Term, [], _} = ktj_decode:decode(Stream),
-    Term.
+    binarise(Term).
 
 erl2json(Term) ->
     ktj_encode:encode(Term).
+
+%%%-------------------------------------------------------------------
+%%% Internals
+%%%-------------------------------------------------------------------
+binarise(Term) when is_list(Term) ->
+    list_to_binary(Term);
+binarise(Other) ->
+    Other.
