@@ -32,15 +32,8 @@
 json2erl(IoList) ->
     Stream = lists:flatten(IoList),
     {Term, [], _} = ktj_decode:decode(Stream),
-    binarise(Term).
+    Term.
 
 erl2json(Term) ->
     ktj_encode:encode(Term).
 
-%%%-------------------------------------------------------------------
-%%% Internals
-%%%-------------------------------------------------------------------
-binarise(Term) when is_list(Term) ->
-    list_to_binary(Term);
-binarise(Other) ->
-    Other.
