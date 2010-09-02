@@ -61,7 +61,7 @@ start_app(App, N) ->
 %%
 %% Don't use this if you can use the deep list returned by io_lib:format, it is
 %% more efficient than flattening each intermediate result this function does.
-%% @spec format("string", [term()]) -> string().
+%% @spec format(string(), [term()]) -> string()
 %% @end
 %%--------------------------------------------------------------------
 format(Format, Args) ->
