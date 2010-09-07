@@ -29,7 +29,7 @@
 %%%-------------------------------------------------------------------
 -module(cushion_couch_api).
 
--export([get_document/4, create_document/4, update_document/5,
+-export([get_document/4, create_document/4, update_document/5, get_dbs/2,
 	 delete_document/5, create_db/3, delete_db/3]).
 
 %%--------------------------------------------------------------------
@@ -81,6 +81,16 @@ update_document(Couch, Port, Db, DocId, Fields) ->
 %%--------------------------------------------------------------------
 delete_document(Couch, Port, Db, DocId, Rev) ->
     http_request(Couch, Port, "DELETE", path(Db, DocId, Rev)).
+
+%%--------------------------------------------------------------------
+%% @doc Get available databases
+%%
+%% @spec get_dbs(string(), integer()) -> binary()
+%% @throws {couchdb_error, {ErrorCode::integer(), Body::binary()}}
+%% @end
+%%--------------------------------------------------------------------
+get_dbs(Couch, Port) ->
+    http_request(Couch, Port, "GET", "_all_dbs").
 
 %%--------------------------------------------------------------------
 %% @doc Create a new database
