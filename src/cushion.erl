@@ -27,7 +27,7 @@
 %%%-------------------------------------------------------------------
 -module(cushion).
 
--export([new_access/2, get_dbs/1]).
+-export([new_access/2, get_dbs/1, create_db/2, delete_db/2]).
 
 new_access(Host, Port) ->
     {Host, Port}.
@@ -36,4 +36,18 @@ get_dbs({Host, Port}) ->
     [binary_to_list(Db)
      || Db <- cushion_json:json2erl(cushion_couch_api:get_dbs(Host, Port))].
 
+create_db({Host, Port}, Name) ->
+    unwrap_ok(
+      cushion_json:json2erl(cushion_couch_api:create_db(Host, Port, Name))).
 
+delete_db({Host, Port}, Name) ->
+    unwrap_ok(
+      cushion_json:json2erl(cushion_couch_api:delete_db(Host, Port, Name))).
+
+%%%-------------------------------------------------------------------
+%%% Internals
+%%%-------------------------------------------------------------------
+unwrap_ok({obj, [{<<"ok">>,true}]}) ->
+    ok;
+unwrap_ok(Other) ->
+    erlang:error({cushion_bug, {{?FILE, ?LINE}, {not_ok, Other}}}).
