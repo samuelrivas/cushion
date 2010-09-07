@@ -34,7 +34,6 @@ new_access(Host, Port) ->
 
 get_dbs({Host, Port}) ->
     [binary_to_list(Db)
-     || Db <- cushion_json:json2erl(
-                binary_to_list(cushion_couch_api:get_dbs(Host, Port)))].
+     || Db <- cushion_json:json2erl(cushion_couch_api:get_dbs(Host, Port))].
 
 
