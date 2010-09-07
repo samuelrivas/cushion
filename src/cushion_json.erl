@@ -31,7 +31,7 @@
 
 json2erl(IoList) ->
     Stream = lists:flatten(IoList),
-    {Term, [], _} = ktj_decode:decode(Stream),
+    {Term, _, _} = ktj_decode:decode(Stream),
     Term.
 
 erl2json(Term) ->
