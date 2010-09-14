@@ -46,15 +46,39 @@ delete_db({Host, Port}, Name) ->
       cushion_json:json2erl(cushion_couch_api:delete_db(Host, Port, Name))).
 
 create_doc({Host, Port}, Db, Doc) ->
-    {"id", "version"}.
+    get_id_and_rev(
+      cushion_json:json2erl(
+        cushion_couch_api:create_doc(
+          Host, Port, Db, cushion_json:erl2json(Doc)))).
 
-delete_doc({Host, Port}, Db, {Id, Vsn}) ->
-    ok.
+delete_doc({Host, Port}, Db, {Id, Rev}) ->
+    unwrap_ok(
+      cushion_json:json2erl(
+        cushion_couch_api:delete_doc(
+          Host, Port, Db, binary_to_list(Id), binary_to_list(Rev)))).
 
 %%%-------------------------------------------------------------------
 %%% Internals
 %%%-------------------------------------------------------------------
-unwrap_ok({obj, [{<<"ok">>,true}]}) ->
-    ok;
-unwrap_ok(Other) ->
-    erlang:error({cushion_bug, {{?FILE, ?LINE}, {not_ok, Other}}}).
+%% Find the ok field in the result and see whether it's true
+unwrap_ok({obj, Fields}) ->
+    case lists:keysearch(<<"ok">>, 1, Fields) of
+        {value, {<<"ok">>,true}} ->
+            ok;
+        Other ->
+            % This shouldn't happen, cushion_couch_api throws errors when
+            % couchdb reports them
+            erlang:error({cushion_bug, {{?FILE, ?LINE}, {not_ok, Other}}})
+    end.
+
+get_id_and_rev({obj, Fields}) ->
+    {get_field(<<"id">>, Fields), get_field(<<"rev">>, Fields)}.
+
+get_field(Field, Fields) ->
+    case lists:keysearch(Field, 1, Fields) of
+        {value, {Field, Value}} ->
+            Value;
+        false ->
+            erlang:error(
+              {cushion_bug, {{?FILE, ?LINE}, {not_found, Field, Fields}}})
+    end.
