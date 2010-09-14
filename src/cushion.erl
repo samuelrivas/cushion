@@ -27,7 +27,7 @@
 %%%-------------------------------------------------------------------
 -module(cushion).
 
--export([new_access/2, get_dbs/1, create_db/2, delete_db/2, create_doc/2,
+-export([new_access/2, get_dbs/1, create_db/2, delete_db/2, create_doc/3,
          delete_doc/3]).
 
 new_access(Host, Port) ->
@@ -45,7 +45,7 @@ delete_db({Host, Port}, Name) ->
     unwrap_ok(
       cushion_json:json2erl(cushion_couch_api:delete_db(Host, Port, Name))).
 
-create_doc({Host, Port}, Db) ->
+create_doc({Host, Port}, Db, Doc) ->
     {"id", "version"}.
 
 delete_doc({Host, Port}, Db, {Id, Vsn}) ->
