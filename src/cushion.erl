@@ -28,7 +28,7 @@
 -module(cushion).
 
 -export([new_access/2, get_dbs/1, create_db/2, delete_db/2, create_doc/3,
-         delete_doc/3]).
+         delete_doc/3, get_doc/3]).
 
 new_access(Host, Port) ->
     {Host, Port}.
@@ -56,6 +56,9 @@ delete_doc({Host, Port}, Db, {Id, Rev}) ->
       cushion_json:json2erl(
         cushion_couch_api:delete_doc(
           Host, Port, Db, binary_to_list(Id), binary_to_list(Rev)))).
+
+get_doc({_Host, _Port}, _Db, _Id) ->
+    {obj, []}.
 
 %%%-------------------------------------------------------------------
 %%% Internals
