@@ -57,8 +57,9 @@ delete_doc({Host, Port}, Db, {Id, Rev}) ->
         cushion_couch_api:delete_doc(
           Host, Port, Db, binary_to_list(Id), binary_to_list(Rev)))).
 
-get_doc({_Host, _Port}, _Db, _Id) ->
-    {obj, []}.
+get_doc({Host, Port}, Db, Id) ->
+    cushion_json:json2erl(
+      cushion_couch_api:get_doc(Host, Port, Db, binary_to_list(Id))).
 
 %%%-------------------------------------------------------------------
 %%% Internals
