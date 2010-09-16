@@ -29,7 +29,7 @@
 %%%-------------------------------------------------------------------
 -module(cushion_util).
 
--export([start_app/1, format/2]).
+-export([start_app/1, format/2, untuple/1]).
 
 %%--------------------------------------------------------------------
 %% @doc Starts an application and all its dependencies.
@@ -66,3 +66,17 @@ start_app(App, N) ->
 %%--------------------------------------------------------------------
 format(Format, Args) ->
     lists:flatten(io_lib:format(Format, Args)).
+
+%%--------------------------------------------------------------------
+%% @doc Unwraps ok-tuples and throws error-tuples. It lets through any other
+%% term.
+%% @spec untuple(Tuple | term()) -> term()
+%%      Tuple = {ok, Value} | {error, Reason}
+%%      Value = term()
+%%      Reason = term()
+%% @throws term()
+%% @end
+%%--------------------------------------------------------------------
+untuple({error, Reason}) -> throw(Reason);
+untuple({ok, What}) -> What;
+untuple(What) -> What.
