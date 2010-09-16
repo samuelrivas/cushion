@@ -29,7 +29,8 @@
 %%%-------------------------------------------------------------------
 -module(cushion_util).
 
--export([start_app/1, format/2, untuple/1, get_value/2, get_value/3]).
+-export([start_app/1, format/2, untuple/1, get_value/2, get_value/3,
+         app_modules/1]).
 
 %%--------------------------------------------------------------------
 %% @doc Starts an application and all its dependencies.
@@ -108,3 +109,18 @@ get_value(Key, List, Default) ->
         {not_found, Key, List} ->
             Default
     end.
+
+%%--------------------------------------------------------------------
+%% @doc Return the list of modules of an application
+%%
+%% The application app file must be in the code path and have the complete list
+%% of modules.
+%% @spec (atom()) -> [atom()]
+%% @end
+%%--------------------------------------------------------------------
+app_modules(App) ->
+    [{application, App, Params}] =
+        untuple(
+          file:consult(
+            code:where_is_file(cushion_util:format("~p.app", [App])))),
+    get_value(modules, Params).
