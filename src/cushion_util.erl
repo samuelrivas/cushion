@@ -37,7 +37,7 @@
 %%
 %% Returns the list of actually started applications, in starting order.
 %%
-%% @spec start_app(atom()) -> [atom()]
+%% @spec (atom()) -> [atom()]
 %% @throws too_much_recursion
 %% @end
 %%--------------------------------------------------------------------
@@ -62,7 +62,7 @@ start_app(App, N) ->
 %%
 %% Don't use this if you can use the deep list returned by io_lib:format, it is
 %% more efficient than flattening each intermediate result this function does.
-%% @spec format(string(), [term()]) -> string()
+%% @spec (string(), [term()]) -> string()
 %% @end
 %%--------------------------------------------------------------------
 format(Format, Args) ->
@@ -71,7 +71,7 @@ format(Format, Args) ->
 %%--------------------------------------------------------------------
 %% @doc Unwraps ok-tuples and throws error-tuples. It lets through any other
 %% term.
-%% @spec untuple(Tuple | term()) -> term()
+%% @spec (Tuple | term()) -> term()
 %%      Tuple = {ok, Value} | {error, Reason}
 %%      Value = term()
 %%      Reason = term()
@@ -83,8 +83,8 @@ untuple({ok, What}) -> What;
 untuple(What) -> What.
 
 %%--------------------------------------------------------------------
-%% @doc Looks for the value associated to a key in a tuple list
-%% @spec get_value(Key, [{key(), value()}]) -> value()
+%% @doc Looks for the value associated to a key in a tuple list.
+%% @spec (Key, [{key(), value()}]) -> value()
 %% @throws not_found(Key, List)
 %% @end
 %%--------------------------------------------------------------------
@@ -98,8 +98,8 @@ get_value(Key, List) ->
 
 %%--------------------------------------------------------------------
 %% @doc Looks for the value associated to a key in a tuple list, returning a
-%% default value if  key is not found
-%% @spec get_value(any(), [{key(), value()}], term()) -> value()
+%% default value if  key is not found.
+%% @spec (any(), [{key(), value()}], term()) -> value()
 %% @end
 %%--------------------------------------------------------------------
 get_value(Key, List, Default) ->
@@ -111,7 +111,7 @@ get_value(Key, List, Default) ->
     end.
 
 %%--------------------------------------------------------------------
-%% @doc Return the list of modules of an application
+%% @doc Return the list of modules of an application.
 %%
 %% The application app file must be in the code path and have the complete list
 %% of modules.
