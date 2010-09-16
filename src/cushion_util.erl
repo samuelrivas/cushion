@@ -29,7 +29,7 @@
 %%%-------------------------------------------------------------------
 -module(cushion_util).
 
--export([start_app/1, format/2, untuple/1]).
+-export([start_app/1, format/2, untuple/1, get_value/2, get_value/3]).
 
 %%--------------------------------------------------------------------
 %% @doc Starts an application and all its dependencies.
@@ -80,3 +80,31 @@ format(Format, Args) ->
 untuple({error, Reason}) -> throw(Reason);
 untuple({ok, What}) -> What;
 untuple(What) -> What.
+
+%%--------------------------------------------------------------------
+%% @doc Looks for the value associated to a key in a tuple list
+%% @spec get_value(Key, [{key(), value()}]) -> value()
+%% @throws not_found(Key, List)
+%% @end
+%%--------------------------------------------------------------------
+get_value(Key, List) ->
+    case lists:keysearch(Key, 1, List) of
+        {value, {Key, Value}} ->
+            Value;
+        false ->
+            throw({not_found, Key, List})
+    end.
+
+%%--------------------------------------------------------------------
+%% @doc Looks for the value associated to a key in a tuple list, returning a
+%% default value if  key is not found
+%% @spec get_value(any(), [{key(), value()}], term()) -> value()
+%% @end
+%%--------------------------------------------------------------------
+get_value(Key, List, Default) ->
+    try
+        get_value(Key, List)
+    catch
+        {not_found, Key, List} ->
+            Default
+    end.
