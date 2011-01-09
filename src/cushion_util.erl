@@ -29,8 +29,8 @@
 %%%-------------------------------------------------------------------
 -module(cushion_util).
 
--export([start_app/1, format/2, untuple/1, get_value/2, get_value/3,
-         app_modules/1, unicode_to_binary/1, binary_to_unicode/1]).
+-export([start_app/1, stop_apps/1, format/2, untuple/1, get_value/2,
+         get_value/3, app_modules/1, unicode_to_binary/1, binary_to_unicode/1]).
 
 %%--------------------------------------------------------------------
 %% @doc Starts an application and all its dependencies.
@@ -56,6 +56,18 @@ start_app(App, N) ->
         ok ->
             [App]
     end.
+
+%%--------------------------------------------------------------------
+%% @doc Stops all the applications in `Apps' in reverse order
+%%
+%% Useful to stop the applications started by {@link start_app/1}
+%%
+%% @spec ([atom()]) -> ok
+%% @end
+%%--------------------------------------------------------------------
+stop_apps(Apps) ->
+    lists:foreach(fun(A) -> application:stop(A) end, lists:reverse(Apps)),
+    ok.
 
 %%--------------------------------------------------------------------
 %% @doc The same as io_lib:format/2 but flattening the result.
