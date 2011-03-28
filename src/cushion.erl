@@ -65,7 +65,7 @@ get_doc({Host, Port}, Db, Id) ->
 %%% Internals
 %%%-------------------------------------------------------------------
 %% Find the ok field in the result and see whether it's true
-unwrap_ok({obj, Fields}) ->
+unwrap_ok({struct, Fields}) ->
     case lists:keysearch(<<"ok">>, 1, Fields) of
         {value, {<<"ok">>,true}} ->
             ok;
@@ -75,7 +75,7 @@ unwrap_ok({obj, Fields}) ->
             erlang:error({cushion_bug, {{?FILE, ?LINE}, {not_ok, Other}}})
     end.
 
-get_id_and_rev({obj, Fields}) ->
+get_id_and_rev({struct, Fields}) ->
     {get_field(<<"id">>, Fields), get_field(<<"rev">>, Fields)}.
 
 get_field(Field, Fields) ->

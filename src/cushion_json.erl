@@ -35,9 +35,8 @@ json2erl(IoList) ->
     json2erl_priv(lists:flatten(IoList)).
 
 json2erl_priv(List) ->
-    {Term, _, _} = ktj_parse:parse(List),
-    Term.
+    mochijson2:decode(List).
 
 erl2json(Term) ->
-    ktj_encode:encode(Term).
+    mochijson2:encode(Term).
 
