@@ -1,4 +1,4 @@
 *~
 src/temp
-*.beam
+ebin
 current_counterexample.eqc
