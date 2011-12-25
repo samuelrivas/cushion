@@ -37,6 +37,9 @@ json2erl(IoList) ->
 json2erl_priv(List) ->
     mochijson2:decode(List).
 
+-spec erl2json(any()) -> iolist().
 erl2json(Term) ->
-    mochijson2:encode(Term).
+    %% XXX for some terms like {struct, []} mochijson2 returns a single binary,
+    %% which is not an IO list (and fail, e.g., in list_to_binary)
+    [mochijson2:encode(Term)].
 
