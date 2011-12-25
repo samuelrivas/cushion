@@ -2,3 +2,4 @@
 src/temp
 ebin
 current_counterexample.eqc
+deps
