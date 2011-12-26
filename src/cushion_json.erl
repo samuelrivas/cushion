@@ -29,15 +29,17 @@
 -module(cushion_json).
 -export([erl2json/1, json2erl/1]).
 
+-spec json2erl(binary()|iolist()) -> cushion:json_term().
 json2erl(Binary) when is_binary(Binary) ->
     json2erl_priv(binary_to_list(Binary));
 json2erl(IoList) ->
     json2erl_priv(lists:flatten(IoList)).
 
+-spec json2erl_priv([binary()|iolist()]) -> cushion:json_term().
 json2erl_priv(List) ->
     mochijson2:decode(List).
 
--spec erl2json(any()) -> iolist().
+-spec erl2json(cushion:json_term()) -> iolist().
 erl2json(Term) ->
     %% XXX for some terms like {struct, []} mochijson2 returns a single binary,
     %% which is not an IO list (and fail, e.g., in list_to_binary)

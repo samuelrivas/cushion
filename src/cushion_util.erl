@@ -37,13 +37,14 @@
 %%
 %% Returns the list of actually started applications, in starting order.
 %%
-%% @spec (atom()) -> [atom()]
 %% @throws too_much_recursion
 %% @end
 %%--------------------------------------------------------------------
+-spec start_app(atom()) -> [atom()].
 start_app(App) ->
     lists:flatten(start_app(App, 30)).
 
+-spec start_app(atom(),0..30) -> [atom()].
 start_app(_, 0) ->
     throw(too_much_recursion);
 start_app(App, N) ->
@@ -62,9 +63,9 @@ start_app(App, N) ->
 %%
 %% Useful to stop the applications started by {@link start_app/1}
 %%
-%% @spec ([atom()]) -> ok
 %% @end
 %%--------------------------------------------------------------------
+-spec stop_apps([atom()]) -> 'ok'.
 stop_apps(Apps) ->
     lists:foreach(fun(A) -> application:stop(A) end, lists:reverse(Apps)),
     ok.
@@ -74,32 +75,29 @@ stop_apps(Apps) ->
 %%
 %% Don't use this if you can use the deep list returned by io_lib:format, it is
 %% more efficient than flattening each intermediate result this function does.
-%% @spec (string(), [term()]) -> string()
 %% @end
 %%--------------------------------------------------------------------
+-spec format(string(),[any()]) -> string().
 format(Format, Args) ->
     lists:flatten(io_lib:format(Format, Args)).
 
 %%--------------------------------------------------------------------
 %% @doc Unwraps ok-tuples and throws error-tuples. It lets through any other
 %% term.
-%% @spec (Tuple | term()) -> term()
-%%      Tuple = {ok, Value} | {error, Reason}
-%%      Value = term()
-%%      Reason = term()
 %% @throws term()
 %% @end
 %%--------------------------------------------------------------------
+-spec untuple(_) -> any().
 untuple({error, Reason}) -> throw(Reason);
 untuple({ok, What}) -> What;
 untuple(What) -> What.
 
 %%--------------------------------------------------------------------
 %% @doc Looks for the value associated to a key in a tuple list.
-%% @spec (Key, [{key(), value()}]) -> value()
 %% @throws not_found(Key, List)
 %% @end
 %%--------------------------------------------------------------------
+-spec get_value(_,[{_,_}]) -> any().
 get_value(Key, List) ->
     case lists:keysearch(Key, 1, List) of
         {value, {Key, Value}} ->
@@ -111,9 +109,9 @@ get_value(Key, List) ->
 %%--------------------------------------------------------------------
 %% @doc Looks for the value associated to a key in a tuple list, returning a
 %% default value if  key is not found.
-%% @spec (any(), [{key(), value()}], term()) -> value()
 %% @end
 %%--------------------------------------------------------------------
+-spec get_value(_,[{_,_}],_) -> any().
 get_value(Key, List, Default) ->
     try
         get_value(Key, List)
@@ -127,9 +125,9 @@ get_value(Key, List, Default) ->
 %%
 %% The application app file must be in the code path and have the complete list
 %% of modules.
-%% @spec (atom()) -> [atom()]
 %% @end
 %%--------------------------------------------------------------------
+-spec app_modules(atom()) -> [atom()].
 app_modules(App) ->
     [{application, App, Params}] =
         untuple(
@@ -144,9 +142,9 @@ app_modules(App) ->
 %% error when `L' contains non-unicode characters (either values greater than
 %% 0x10FFFF, values in the interval 0xD800--0xD8FF, or 0xFFFE and 0xFFFF.
 %%
-%% @spec ([int()]) -> binary()
 %% @end
 %%--------------------------------------------------------------------
+-spec unicode_to_binary(string()) -> binary().
 unicode_to_binary(L) ->
     case unicode:characters_to_binary(L, unicode, utf8) of
         {error, _Good, Bad} ->
@@ -161,9 +159,9 @@ unicode_to_binary(L) ->
 %% The main difference with the unicode module is that this function raises an
 %% error when `B' is not an utf-8 encoded binary
 %%
-%% @spec (binary()) -> [int()]
 %% @end
 %%--------------------------------------------------------------------
+-spec binary_to_unicode(binary()) -> string().
 binary_to_unicode(B) ->
     case unicode:characters_to_list(B, utf8) of
         {error, _Good, Bad} ->

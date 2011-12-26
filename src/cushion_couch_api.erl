@@ -32,12 +32,22 @@
 -export([get_doc/4, create_doc/4, update_doc/5, get_dbs/2,
 	 delete_doc/5, create_db/3, delete_db/3]).
 
+-type address() :: cushion:address().
+-type port_number() :: inet:port_number().
+-type method() :: get | put | post | delete.
+-type httpc_request() :: {url(),headers()}
+                       | {url(),headers(),content_type(),body()}.
+-type url() :: string().
+-type headers() :: [{string(),string()}].
+-type content_type() :: string().
+-type body() :: binary().
+
 %%--------------------------------------------------------------------
 %% @doc Fetch a document.
-%% @spec get_doc(string(), integer(), string(), string()) -> binary()
 %% @throws {couchdb_error, {ErrorCode::integer(), Body::binary()}}
 %% @end
 %%--------------------------------------------------------------------
+-spec get_doc(address(),port_number(),string(),string()) -> string().
 get_doc(Couch, Port, Db, DocId) ->
     http_request(Couch, Port, get, path(Db, DocId)).
 
@@ -48,11 +58,10 @@ get_doc(Couch, Port, Db, DocId) ->
 %% documents. This call performs a POST call that could be problematic in
 %% certain network configurations.
 %%
-%% @spec create_doc(string(), integer(), string(),
-%%                       deep_string()) -> binary()
-%% @throws {couchdb_error, {ErrorCode::integer(), Body::binary()}}
+%% @throws {couchdb_error, {ErrorCode::integer(), Body::string()}}
 %% @end
 %%--------------------------------------------------------------------
+-spec create_doc(address(),port_number(),string(),iolist()) -> string().
 create_doc(Couch, Port, Db, Fields) ->
     http_request(Couch, Port, post, Db, Fields).
 
@@ -64,64 +73,70 @@ create_doc(Couch, Port, Db, Fields) ->
 %% field and its value is the same as the current `_rev' value of the document
 %% stored in the DB.
 %%
-%% @spec update_doc(string(), integer(), string(), string(),
-%%                       deep_string()) -> binary()
-%% @throws {couchdb_error, {ErrorCode::integer(), Body::binary()}}
+%% @throws {couchdb_error, {ErrorCode::integer(), Body::string()}}
 %% @end
 %%--------------------------------------------------------------------
+-spec update_doc(address(),port_number(),string(),string(),iolist()) ->
+                        string().
 update_doc(Couch, Port, Db, DocId, Fields) ->
     http_request(Couch, Port, put, path(Db, DocId), Fields).
 
 %%--------------------------------------------------------------------
 %% @doc Delete a document
-%% @spec delete_doc(string(), integer(), string(), string(), string()) ->
-%%                       binary()
-%% @throws {couchdb_error, {ErrorCode::integer(), Body::binary()}}
+%% @throws {couchdb_error, {ErrorCode::integer(), Body::string()}}
 %% @end
 %%--------------------------------------------------------------------
+-spec delete_doc(address(),port_number(),string(),string(),string()) ->
+                        string().
 delete_doc(Couch, Port, Db, DocId, Rev) ->
     http_request(Couch, Port, delete, path(Db, DocId, Rev)).
 
 %%--------------------------------------------------------------------
 %% @doc Get available databases
 %%
-%% @spec get_dbs(string(), integer()) -> binary()
-%% @throws {couchdb_error, {ErrorCode::integer(), Body::binary()}}
+%% @throws {couchdb_error, {ErrorCode::integer(), Body::string()}}
 %% @end
 %%--------------------------------------------------------------------
+-spec get_dbs(address(),port_number()) -> string().
 get_dbs(Couch, Port) ->
     http_request(Couch, Port, get, "_all_dbs").
 
 %%--------------------------------------------------------------------
 %% @doc Create a new database
 %%
-%% @spec create_db(string(), integer(), string()) -> binary()
-%% @throws {couchdb_error, {ErrorCode::integer(), Body::binary()}}
+%% @throws {couchdb_error, {ErrorCode::integer(), Body::string()}}
 %% @end
 %%--------------------------------------------------------------------
+-spec create_db(address(),port_number(),string()) -> string().
 create_db(Couch, Port, Db) ->
     http_request(Couch, Port, put, Db).
 
 %%--------------------------------------------------------------------
 %% @doc Delete and existing database
 %%
-%% @spec delete_db(string(), integer(), string()) -> binary()
-%% @throws {couchdb_error, {ErrorCode::integer(), Body::binary()}}
+%% @throws {couchdb_error, {ErrorCode::integer(), Body::string()}}
 %% @end
 %%--------------------------------------------------------------------
+-spec delete_db(address(),port_number(),string()) -> string().
 delete_db(Couch, Port, Db) ->
     http_request(Couch, Port, delete, Db).
 
 %%%-------------------------------------------------------------------
 %%% Internals
 %%%-------------------------------------------------------------------
+-spec http_request(address(),port_number(),delete | get | put,iolist()) ->
+                          string().
 http_request(Couch, Port, Method, Path) ->
     http_request(Couch, Port, Method, Path, "").
 
+-spec http_request(address(),port_number(),method(),iolist(),iolist()) ->
+                          string().
 http_request(Couch, Port, Method, Path, Payload) ->
     {Status, Body} = send_request(Couch, Port, Method, Path, Payload),
     check_status(Method, Status, Body).
 
+-spec send_request(address(),port_number(),method(),iolist(),iolist()) ->
+                          {{integer(),string()},string()}.
 send_request(Couch, Port, Method, Path, Payload) ->
     Url = cushion_util:format("http://~s:~w/~s", [Couch, Port, Path]),
     Request = make_request(Url, Method, Payload),
@@ -129,12 +144,14 @@ send_request(Couch, Port, Method, Path, Payload) ->
         httpc:request(Method, Request, [{timeout, infinity}], []),
     {{Status, Reason}, Body}.
 
+-spec make_request(string(),method(),iolist()) -> httpc_request().
 make_request(Url, Method, Payload)
   when Method =:= put; Method =:= post ->
     {Url, [], "application/json", list_to_binary(Payload)};
 make_request(Url, _, _) ->
     {Url, []}.
 
+-spec check_status(method(),{integer(),string()},string()) -> string().
 check_status(Method, Status, Body) ->
     Expected = expected_status(Method),
     case Status of
@@ -144,16 +161,20 @@ check_status(Method, Status, Body) ->
             couch_error(ErrorCode, Body)
     end.
 
+-spec expected_status(method()) -> 200 | 201.
 expected_status(Method) when Method =:= get; Method =:= delete ->
     200;
 expected_status(Method) when Method =:= put; Method =:= post ->
     201.
 
+-spec couch_error(_,_) -> none().
 couch_error(ErrorCode, Body) ->
    throw({couchdb_error, {ErrorCode, Body}}).
 
+-spec path(string(),string()) -> string().
 path(Db, File) ->
     filename:join(Db, File).
 
+-spec path(string(), string(),string()) -> iolist().
 path(Db, File, Rev) ->
     io_lib:format("~s?rev=~s", [path(Db, File), Rev]).
